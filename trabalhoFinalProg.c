@@ -25,6 +25,12 @@ void cadastrarRegistro(){
     }else{
         printf("Digite o codigo do registro: ");
         scanf("%d", &registro.codigo);
+        // Verificar se o código já existe no arquivo
+        if (CodigoJaRegistrado(registro.codigo)) {
+            printf("Produto com esse codigo ja existe! Escolha outro codigo.\n");
+            fclose(arquivo);
+            return;
+        }
         printf("Digite o nome: ");
         scanf("%s", &registro.nome);
         printf("Digite o preco: ");
@@ -169,6 +175,27 @@ void exibirRegistros(){
         }
         fclose(arquivo);
     }
+}
+
+// Conferir se ja foi registrado com esse codigo
+int CodigoJaRegistrado(int codigo) {
+    Registro registro;
+    FILE *arquivo = fopen("arquivo.bin", "rb"); // Arquivo para leitura
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+        return 0;
+    }
+
+    while (fread(&registro, sizeof(Registro), 1, arquivo)) {
+        if (registro.codigo == codigo) {
+            fclose(arquivo);
+            return 1; // Código encontrado, já existe no arquivo
+        }
+    }
+
+    fclose(arquivo);
+    return 0; // Código não encontrado, pode ser usado
 }
 
 //Menu
