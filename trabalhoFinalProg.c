@@ -123,8 +123,8 @@ void removerRegistro(int codigo){
     Registro registro;
     FILE *arquivo;
     FILE *arquivoTemp;
-    arquivo = fopen("arquivo.bin", "rb");  // Abre o arquivo
-    arquivoTemp = fopen("arquivoTemp.bin", "wb"); // Abre o arquivo, porém se existir ele é destruido e reinicializado
+    arquivo = fopen("arquivo.bin", "rb");  // Abre o arquivo para leitura
+    arquivoTemp = fopen("arquivoTemp.bin", "wb"); // Abre o arquivo para gravacação, e como ele n existe ele é criado
     if(arquivo == NULL){
         printf("Erro ao abrir o arquivo \n");
     }else{
@@ -145,13 +145,13 @@ void removerRegistro(int codigo){
 void exibirRegistros(){
     Registro registro;
     FILE *arquivo;
-    arquivo = fopen("arquivo.bin", "rb");
+    arquivo = fopen("arquivo.bin", "rb"); // arquivo para leitura
     if(arquivo == NULL){
         printf("Erro ao abrir o arquivo \n"); // Abre o arquivo
     }else{
-        fseek(arquivo, 0, SEEK_END);
-        int size = ftell(arquivo);
-        fseek(arquivo, 0, SEEK_SET);
+        fseek(arquivo, 0, SEEK_END); // Move o ponteiro para o final do arquivo
+        int size = ftell(arquivo); // Obtém a posição atual do ponteiro, que é o tamanho do arquivo
+        fseek(arquivo, 0, SEEK_SET); // Move o ponteiro de volta para o início do arquivo
 
         if(size == 0){
             printf("Nao ha registros ainda! \n");
