@@ -179,12 +179,16 @@ void menu(){
         switch(opcao){
             case 0:
                 system("cls");
-                printf("1 - Cadastrar registro \n");
-                printf("2 - Consultar registro \n");
-                printf("3 - Alterar registro \n");
-                printf("4 - Remover registro \n");                
-                printf("5 - Exibir todos os registros \n");
-                printf("6 - Sair \n");
+                printf("=============================================\n");
+                printf("               MENU PRINCIPAL\n");
+                printf("=============================================\n");
+                printf("1 - Cadastrar registro\n");
+                printf("2 - Consultar registro\n");
+                printf("3 - Alterar registro\n");
+                printf("4 - Remover registro\n");
+                printf("5 - Exibir todos os registros\n");
+                printf("6 - Sair\n");
+                printf("=============================================\n");
                 printf("Digite a opcao desejada: ");
                 scanf("%d", &opcao);
                 break;
