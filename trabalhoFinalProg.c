@@ -19,7 +19,7 @@ typedef struct {
 void cadastrarRegistro(){
     Registro registro;
     FILE *arquivo;
-    arquivo = fopen("arquivo.bin", "ab");  // gravação
+    arquivo = fopen("arquivo.bin", "ab");  // gravação, se nao tiver arquivo ele cria novo
     if(arquivo == NULL){
         printf("Erro ao abrir o arquivo \n");
     }else{
@@ -31,8 +31,13 @@ void cadastrarRegistro(){
         scanf("%f", &registro.preco);
         printf("Digite a quantidade em estoque: ");
         scanf("%d", &registro.estoque);
-        printf("Digite o generico(1 para sim e 0 para nao): ");
+        printf("Digite se o produto eh generico(1 para sim e 0 para nao): ");
         scanf("%d", &registro.generico);
+        if(registro.generico != 1 && registro.generico != 0) {
+            printf("Valor invalido \n");
+            printf("Digite 1 para sim e 0 para nao: ");
+            scanf("%d", &registro.generico);
+        }
         printf("Digite a categoria: ");
         scanf("%s", &registro.categoria);
         printf("Digite o fabricante: ");
@@ -61,18 +66,20 @@ void consultarRegistro(int codigo){
                 printf("Generico: %d \n", registro.generico);
                 printf("Categoria: %s \n", registro.categoria);
                 printf("Fabricante: %s \n", registro.fabricante);
-                break;
+                fclose(arquivo);
+                return;
             }
         }
-        fclose(arquivo);
+        printf("Codigo nao encontrado! \n");
     }
+    fclose(arquivo);
 }
 
 //Alterar registro por codigo
 void alterarRegistro(int codigo){
     Registro registro;
     FILE *arquivo;
-    arquivo = fopen("arquivo.bin", "rb+");
+    arquivo = fopen("arquivo.bin", "rb+"); // Abre o arquivo para leitura e gravação
     if(arquivo == NULL){
         printf("Erro ao abrir o arquivo \n");
     }else{
@@ -89,18 +96,25 @@ void alterarRegistro(int codigo){
                 scanf("%d", &registro.estoque);
                 printf("Digite o generico(1 para sim e 0 para nao): ");
                 scanf("%d", &registro.generico);
+                if(registro.generico != 1 && registro.generico != 0) {
+                    printf("Valor invalido \n");
+                    printf("Digite 1 para sim e 0 para nao: ");
+                    scanf("%d", &registro.generico);
+                }
                 printf("Digite a categoria: ");
                 scanf("%s", &registro.categoria);
                 printf("Digite o fabricante: ");
                 scanf("%s", &registro.fabricante);
                 fseek(arquivo, -sizeof(Registro), SEEK_CUR);
                 fwrite(&registro, sizeof(Registro), 1, arquivo);
-                break;
+                fclose(arquivo);
+                printf("Produto alterado com sucesso\n");
+                return;
             }
         }
-        fclose(arquivo);
-        printf("Produto alterado com sucesso\n");
     }
+    printf("Codigo de produto nao encontrado\n");
+    fclose(arquivo);
 }
 
 
@@ -109,8 +123,8 @@ void removerRegistro(int codigo){
     Registro registro;
     FILE *arquivo;
     FILE *arquivoTemp;
-    arquivo = fopen("arquivo.bin", "rb");
-    arquivoTemp = fopen("arquivoTemp.bin", "wb");
+    arquivo = fopen("arquivo.bin", "rb");  // Abre o arquivo
+    arquivoTemp = fopen("arquivoTemp.bin", "wb"); // Abre o arquivo, porém se existir ele é destruido e reinicializado
     if(arquivo == NULL){
         printf("Erro ao abrir o arquivo \n");
     }else{
@@ -133,17 +147,25 @@ void exibirRegistros(){
     FILE *arquivo;
     arquivo = fopen("arquivo.bin", "rb");
     if(arquivo == NULL){
-        printf("Erro ao abrir o arquivo \n");
+        printf("Erro ao abrir o arquivo \n"); // Abre o arquivo
     }else{
-        while(fread(&registro, sizeof(Registro), 1, arquivo)){
-            printf("Codigo: %d \n", registro.codigo);
-            printf("Nome: %s \n", registro.nome);
-            printf("Preco: %.2f \n", registro.preco);
-            printf("Estoque: %d \n", registro.estoque);
-            printf("Generico: %d \n", registro.generico);
-            printf("Categoria: %s \n", registro.categoria);
-            printf("Fabricante: %s \n", registro.fabricante);
-            printf("\n");
+        fseek(arquivo, 0, SEEK_END);
+        int size = ftell(arquivo);
+        fseek(arquivo, 0, SEEK_SET);
+
+        if(size == 0){
+            printf("Nao ha registros ainda! \n");
+        }else{
+            while(fread(&registro, sizeof(Registro), 1, arquivo)){
+                printf("Codigo: %d \n", registro.codigo);
+                printf("Nome: %s \n", registro.nome);
+                printf("Preco: %.2f \n", registro.preco);
+                printf("Estoque: %d \n", registro.estoque);
+                printf("Generico: %d \n", registro.generico);
+                printf("Categoria: %s \n", registro.categoria);
+                printf("Fabricante: %s \n", registro.fabricante);
+                printf("\n");
+            }
         }
         fclose(arquivo);
     }
@@ -153,14 +175,14 @@ void exibirRegistros(){
 void menu(){
     int opcao = 0;
     int codigo;
-    do{;
+    while(1){
         switch(opcao){
             case 0:
                 system("cls");
                 printf("1 - Cadastrar registro \n");
-                printf("2 - Remover registro \n");
+                printf("2 - Consultar registro \n");
                 printf("3 - Alterar registro \n");
-                printf("4 - Consultar registro \n");
+                printf("4 - Remover registro \n");                
                 printf("5 - Exibir todos os registros \n");
                 printf("6 - Sair \n");
                 printf("Digite a opcao desejada: ");
@@ -174,9 +196,9 @@ void menu(){
                 break;
             case 2:
                 system("cls");
-                printf("Digite o codigo do registro que deseja remover: ");
+                printf("Digite o codigo do registro que deseja consultar: ");
                 scanf("%d", &codigo);
-                removerRegistro(codigo);
+                consultarRegistro(codigo);
                 system("pause");
                 opcao = 0;
                 break;
@@ -190,9 +212,9 @@ void menu(){
                 break;
             case 4:
                 system("cls");
-                printf("Digite o codigo do registro que deseja consultar: ");
+                printf("Digite o codigo do registro que deseja remover: ");
                 scanf("%d", &codigo);
-                consultarRegistro(codigo);
+                removerRegistro(codigo);
                 system("pause");
                 opcao = 0;
                 break;
@@ -203,15 +225,15 @@ void menu(){
                 opcao = 0;
                 break;
             case 6:
-                printf("Saindo... \n");
-                opcao = 0;
-                break;
+                printf("Finalizando registros... \n");
+                exit(0);
             default:
                 printf("Opcao invalida \n");
                 system("pause");
+                opcao = 0;
                 break;
         }
-    }while(opcao != 6);
+    }
 }
 
 int main(){
